@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Path, HTTPException, Query
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, computed_field, Field
 from typing import Annotated, Literal
 import json
@@ -95,6 +96,7 @@ def create_patient(patient : Patient):
     else:
         data[patient.id] = patient.model_dump(exclude='id')
         save_data(data)
-        
+        return JSONResponse(status_code=201, content={'message' : "patient created successfully"})
+
 
 
