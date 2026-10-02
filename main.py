@@ -10,7 +10,7 @@ class Patient(BaseModel):
     id: Annotated[str, Field(..., description="id of the patient")]
     name: Annotated[str, Field(..., description="name of the patient", max_length=40, min_length=2)] 
     city: Annotated[str, Field(..., description="city of the patient")]
-    age: Annotated[str, Field(..., description="age of the patient", ge=0, le=120)]
+    age: Annotated[int, Field(..., description="age of the patient", ge=0, le=120)]
     gender: Annotated[Literal['male', 'female', 'others'], Field(..., description="gender of the patient")]
     height: Annotated[float, Field(gt=0, description="height of the patient in (m)")] 
     weight: Annotated[float, Field(gt=0, description="height of the patient in (kg)")] 
