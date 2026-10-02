@@ -40,6 +40,10 @@ def load_data():
 
     return data
 
+def save_data(data):
+    with open("patients.json", 'w') as f:
+        json.dump(data, f)
+
 @app.get("/")
 def hello():
     return {"message": "Patient Record Managment API"}
@@ -82,5 +86,15 @@ def sort(sortby: str = Query("height", description="Sort on the basis of height,
 
     return sorted_data 
 
-    
+@app.post("/create")
+def create_patient(patient : Patient):
+    data = load_data()
+
+    if patient.id in data:
+        raise HTTPException(status=400, detail="patient already exists")
+    else:
+        data[patient.id] = patient.model_dump(exclude='id')
+        save_data(data)
+        
+
 
