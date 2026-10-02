@@ -131,6 +131,8 @@ def update_patient(patient_id : str, patient_update: Patient_Update):
     patient_old_data = data[patient_id]
     patient_new_data = patient_update.model_dump(exclude_unset=True)
 
+    if patient_id not in data:
+        raise HTTPException(status_code=404)
     for key, value in patient_new_data.items():
         patient_old_data[key] = value
 
@@ -140,6 +142,23 @@ def update_patient(patient_id : str, patient_update: Patient_Update):
     data[patient_id] = updated_patient_object.model_dump(exclude=['id'])
 
     save_data(data)
+
+    return JSONResponse(status_code=200)
+
+
+@app.delete("/delete/{patient_id}")
+def delete_patient(patient_id: str):
+    data = load_data()
+
+    if patient_id not in data:
+        raise HTTPException(status_code=404, detail="patient not found")
+
+    del data[patient_id]
+
+    save_data(data)
+
+    return JSONResponse(status_code=200)
+
 
 
 
