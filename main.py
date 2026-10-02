@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Path, HTTPException, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, computed_field, Field
-from typing import Annotated, Literal
+from typing import Annotated, Literal, Optional
 import json
 
 app = FastAPI()
@@ -14,6 +14,32 @@ class Patient(BaseModel):
     gender: Annotated[Literal['male', 'female', 'others'], Field(..., description="gender of the patient")]
     height: Annotated[float, Field(gt=0, description="height of the patient in (m)")] 
     weight: Annotated[float, Field(gt=0, description="height of the patient in (kg)")] 
+
+    @computed_field 
+    @property
+    def bmi (self) -> float:
+        bmi = self.weight/(self.height**2)
+        bmi = round(bmi, 2)
+
+        return bmi
+
+    @computed_field
+    @property
+    def verdict(self) -> str:
+        if self.bmi < 18.5:
+            return "underweight"
+        elif self.bmi < 30:
+            return "normal"
+        else:
+            return "obese"
+
+class Patient_Update(BaseModel):
+    name: Annotated[Optional[str], Field(default=None)]
+    city: Annotated[Optional[str], Field(default=None)]
+    age: Annotated[Optional[int], Field(default=None, gt=0)]
+    gender: Annotated[Optional[Literal['male', 'female']], Field(default=None)]
+    height: Annotated[Optional[float], Field(default=None, gt=0)]
+    weight: Annotated[Optional[float], Field(default=None, gt=0)]
 
     @computed_field 
     @property
@@ -97,6 +123,27 @@ def create_patient(patient : Patient):
         data[patient.id] = patient.model_dump(exclude='id')
         save_data(data)
         return JSONResponse(status_code=201, content={'message' : "patient created successfully"})
+
+@app.put("/update/{patient_id}")
+def update_patient(patient_id : str, patient_update: Patient_Update):
+    data = load_data()
+
+    patient_old_data = data[patient_id]
+    patient_new_data = patient_update.model_dump(exclude_unset=True)
+
+    for key, value in patient_new_data.items():
+        patient_old_data[key] = value
+
+    patient_old_data['id'] =  patient_id
+    updated_patient_object = Patient(**patient_old_data)
+
+    data[patient_id] = updated_patient_object.model_dump(exclude=['id'])
+
+    save_data(data)
+
+
+
+
 
 
 
