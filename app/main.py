@@ -22,7 +22,6 @@ while True:
 
     
 class Patient(BaseModel):
-    id: Annotated[str, Field(..., description="id of the patient")]
     name: Annotated[str, Field(..., description="name of the patient", max_length=40, min_length=2)] 
     city: Annotated[str, Field(..., description="city of the patient")]
     age: Annotated[int, Field(..., description="age of the patient", ge=0, le=120)]
@@ -105,8 +104,40 @@ def delete_patient(patient_id: str = Path(..., description = 'id of the patient 
     print("patient is deleted")
     return deleted_patient
 
-
-
+@app.put("/update/{patient_id}")
+def update_patient(patient: Patient, patient_id: str):
+  query = """
+        UPDATE "Patient Management"
+        SET name = %s,
+            city = %s,
+            age = %s,
+            gender = %s,
+            height = %s,
+            weight = %s,
+            bmi = %s,
+            verdict = %s
+        WHERE id = %s
+        RETURNING *;
+    """
+  cursor.execute(
+      query,
+      (
+          patient.name,
+          patient.city,
+          patient.age,
+          patient.gender,
+          patient.height,
+          patient.weight,
+          patient.bmi,
+          patient.verdict,
+          patient_id,  # URL path parameter enforces target row
+      ),
+  )
+  updated_patient = cursor.fetchone()
+  if not updated_patient:
+    raise HTTPException(status_code=404, detail="Patient not found")
+  conn.commit()
+  return updated_patient
 
 
 
