@@ -59,7 +59,7 @@ def view():
     return load_data()
 
 @app.get("/patient/{patient_id}")
-def view_patient(patient_id: str = Path(..., description = 'id of the patient in the db', example = "P001",)):
+def view_patient(patient_id: str = Path(..., description = 'id of the patient in the db', example = "1",)):
 
     cursor.execute('SELECT * FROM "Patient Management" WHERE id = %s', (patient_id))
     patient = cursor.fetchone()
@@ -68,18 +68,43 @@ def view_patient(patient_id: str = Path(..., description = 'id of the patient in
         raise HTTPException(status_code=404, detail="patient not found")
     return patient
 
-@app.post("/create")
-def create_patient(patient : Patient):
-    cursor.execute("""
-        INSERT INTO "Patient Management" (name, city, age, gender, height, weight) 
+@app.post("/create", status_code=201)
+def create_patient(patient: Patient):
+  cursor.execute(
+      """
+        INSERT INTO "Patient Management" (name, city, age, gender, height, weight, bmi, verdict) 
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s) 
         RETURNING *;
-    """, (patient.name, patient.city, patient.age, patient.gender, patient.height, patient.weight, patient.bmi, patient.verdict))
+    """,
+      (
+          patient.name,
+          patient.city,
+          patient.age,
+          patient.gender,
+          patient.height,
+          patient.weight,
+          patient.bmi,
+          patient.verdict,
+      ),
+  )
 
-    print("Patient added")
-    new_post = cursor.fetchone()
+  new_patient = cursor.fetchone()
+  conn.commit()
+  print("patient added")
+  return new_patient
+
+@app.delete("/delete/{patient_id}")
+def delete_patient(patient_id: str = Path(..., description = 'id of the patient in the db', example = "1")):
+    cursor.execute('DELETE FROM "Patient Management" WHERE id = %s RETURNING *;', (patient_id,))
+    deleted_patient = cursor.fetchone()
+
+    if not deleted_patient:
+        raise HTTPException(status_code=404, detail="patient not found")
+
     conn.commit()
-    return new_post
+    print("patient is deleted")
+    return deleted_patient
+
 
 
 
