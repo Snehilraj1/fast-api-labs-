@@ -70,12 +70,16 @@ def view_patient(patient_id: str = Path(..., description = 'id of the patient in
 
 @app.post("/create")
 def create_patient(patient : Patient):
-    data = load_data()
+    cursor.execute("""
+        INSERT INTO "Patient Management" (name, city, age, gender, height, weight) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s) 
+        RETURNING *;
+    """, (patient.name, patient.city, patient.age, patient.gender, patient.height, patient.weight, patient.bmi, patient.verdict))
 
-    if patient.id in data:
-        raise HTTPException(status=400, detail="patient already exists")
-    else:
-        pass
+    print("Patient added")
+    new_post = cursor.fetchone()
+    conn.commit()
+    return new_post
 
 
 
