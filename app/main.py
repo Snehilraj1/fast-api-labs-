@@ -71,14 +71,7 @@ def view_patient(patient_id: int, db: Session = Depends(get_db)):
 @app.post("/create", response_model=PatientOut, status_code=201)
 def create_patient(payload: PatientBase, db: Session = Depends(get_db)):
   new_patient = models.Patient(
-      name=payload.name,
-      city=payload.city,
-      age=payload.age,
-      gender=payload.gender,
-      height=payload.height,
-      weight=payload.weight,
-      bmi=payload.bmi,
-      verdict=payload.verdict,
+      **payload.model_dump()
   )
   db.add(new_patient)
   db.commit()
@@ -114,3 +107,5 @@ def update_patient(
   db.commit()
   db.refresh(patient)
   return patient
+
+

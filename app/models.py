@@ -18,3 +18,4 @@ class Patient(Base):
   added_at = Column(
       TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
   )
+
