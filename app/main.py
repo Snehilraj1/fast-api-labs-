@@ -73,6 +73,7 @@ def create_patient(payload: PatientBase, db: Session = Depends(get_db)):
   new_patient = models.Patient(
       **payload.model_dump()
   )
+#   basically parsing a python dict making the code clearner 
   db.add(new_patient)
   db.commit()
   db.refresh(new_patient)
