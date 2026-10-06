@@ -71,3 +71,16 @@ def update_patient(
   return patient
 
 
+@app.post("/createuser",  status_code=201, response_model=schemas.UserOut)
+def create_patient(payload: schemas.UserIn, db: Session = Depends(get_db)):
+  new_user = models.User(
+      **payload.model_dump()
+  )
+#   basically parsing a python dict making the code clearner 
+  db.add(new_user)
+  db.commit()
+  db.refresh(new_user)
+  return new_user
+
+
+

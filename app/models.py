@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Float, Integer, String, TIMESTAMP
 from sqlalchemy.sql import func
 from .database import Base
+from pydantic import EmailStr
 
 
 class Patient(Base):
@@ -19,3 +20,11 @@ class Patient(Base):
       TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
   )
 
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    username = Column(String(50), primary_key=True, index=True)
+    email_id = Column(String(100), unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, computed_field, EmailStr
 from typing import Annotated, Literal
 
 
@@ -65,3 +65,14 @@ class Patientresponse(BaseModel):
         float, Field(gt=0, description="weight of the patient in (kg)")
     ]
 
+
+class UserIn(BaseModel):
+    username: Annotated[str, Field(min_length=3, max_length=30)]
+    email_id: EmailStr
+    password: Annotated[str, Field(min_length=6)]
+
+class UserOut(BaseModel):
+    username: str
+    email_id: EmailStr
+
+    model_config = ConfigDict(from_attributes=True)
