@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from .. import models, schemas
 from ..database import engine, get_db
 
-router = APIRouter()
+router = APIRouter(tags=["User Management"])
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 @router.post("/createuser",  status_code=201, response_model=schemas.UserOut)
 def create_user(payload: schemas.UserIn, db: Session = Depends(get_db)):

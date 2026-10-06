@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from .. import models, schemas
 from ..database import engine, get_db
 
-router = APIRouter()
+router = APIRouter(tags=["Patient Management"])
 
 
 @router.get("/view", response_model=List[schemas.Patientresponse])
