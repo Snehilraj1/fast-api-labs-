@@ -13,22 +13,23 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-@app.get("/view", response_model=List[schemas.PatientOut])
+@app.get("/view", response_model=List[schemas.Patientresponse])
 def view_all(db: Session = Depends(get_db)):
   return db.query(models.Patient).all()
 
 
-@app.get("/patient/{patient_id}", response_model=schemas.PatientOut)
+@app.get("/patient/{patient_id}", response_model=schemas.Patientresponse)
 def view_patient(patient_id: int, db: Session = Depends(get_db)):
   patient = (
       db.query(models.Patient).filter(models.Patient.id == patient_id).first()
   )
+  print(type(patient))
   if not patient:
     raise HTTPException(status_code=404, detail="patient not found")
   return patient
 
 
-@app.post("/create", response_model=schemas.PatientOut, status_code=201)
+@app.post("/create",  status_code=201)
 def create_patient(payload: schemas.PatientBase, db: Session = Depends(get_db)):
   new_patient = models.Patient(
       **payload.model_dump()
@@ -51,7 +52,7 @@ def delete_patient(patient_id: int, db: Session = Depends(get_db)):
   db.commit()
 
 
-@app.put("/update/{patient_id}", response_model=schemas.PatientOut)
+@app.put("/update/{patient_id}", )
 def update_patient(
     patient_id: int, payload: schemas.PatientBase, db: Session = Depends(get_db)
 ):
