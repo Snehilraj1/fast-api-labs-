@@ -69,7 +69,7 @@ class Patientresponse(BaseModel):
 class UserIn(BaseModel):
     username: Annotated[str, Field(min_length=3, max_length=30)]
     email_id: EmailStr
-    password: Annotated[str, Field(min_length=6)]
+    hashed_password: Annotated[str, Field(min_length=6)]
 
 class UserOut(BaseModel):
     username: str
